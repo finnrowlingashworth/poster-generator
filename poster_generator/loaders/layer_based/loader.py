@@ -158,7 +158,7 @@ class LayerBasedLoader(BaseCanvasLoader, ABC):
 
         # Support late relative positions
         if "position" in element_data:
-            element_info["position"] = self.resolve(element_data["position"], key="position")
+            element_info["position"] = self._parse_xy(element_data["position"])
         elif "rel_position" in element_data:
             rel_position_data = element_data["rel_position"]
             element_info["rel_position"] = self._parse_element_relative_position(element_id, rel_position_data)
@@ -167,6 +167,9 @@ class LayerBasedLoader(BaseCanvasLoader, ABC):
 
         logger.debug("Element %s info: %s", element_id, element_info)
         return element_info
+
+    def _parse_xy(self, position: dict):
+        return (self.resolve(position.get("x")), self.resolve(position.get("y")))
 
     def _parse_element_relative_position(self, element_id: str, rel_position_data: dict):
         source = self.resolve(rel_position_data.get("source"))
@@ -180,7 +183,7 @@ class LayerBasedLoader(BaseCanvasLoader, ABC):
             raise ValueError(msg)
 
         if "offset" in rel_position_data:
-            offset = self.resolve(rel_position_data.get("offset"), key="offset")
+            offset = self._parse_xy(rel_position_data.get("offset"))
         else:
             offset = (0, 0)
 
